@@ -44,7 +44,7 @@
 Career-Ops turns any AI coding CLI into a full job search command center. Instead of manually tracking applications in a spreadsheet, you get an AI-powered pipeline that:
 
 - **Evaluates offers** with a structured A-F scoring system (10 weighted dimensions)
-- **Generates tailored PDFs** -- ATS-optimized CVs customized per job description
+- **Uses prebuilt resume packs by default** -- deterministic software/ML/GenAI selection for low-token apply flows
 - **Scans portals** automatically (Greenhouse, Ashby, Lever, company pages)
 - **Processes in batch** -- evaluate 10+ offers in parallel with sub-agents
 - **Tracks everything** in a single source of truth with integrity checks
@@ -61,7 +61,7 @@ Built by someone who used it to evaluate 740+ job offers, generate 100+ tailored
 
 | Feature | Description |
 |---------|-------------|
-| **Auto-Pipeline** | Paste a URL, get a full evaluation + PDF + tracker entry |
+| **Auto-Pipeline** | Paste a URL, get evaluation + resume selection + tracker entry |
 | **6-Block Evaluation** | Role summary, CV match, level strategy, comp research, personalization, interview prep (STAR+R) |
 | **Interview Story Bank** | Accumulates STAR+Reflection stories across evaluations -- 5-10 master stories that answer any behavioral question |
 | **Negotiation Scripts** | Salary negotiation frameworks, geographic discount pushback, competing offer leverage |
@@ -113,7 +113,7 @@ Career-ops is a single slash command with multiple modes:
 
 ```
 /career-ops                → Show all available commands
-/career-ops {paste a JD}   → Full auto-pipeline (evaluate + PDF + tracker)
+/career-ops {paste a JD}   → Full auto-pipeline (evaluate + resume selection + tracker)
 /career-ops scan           → Quick low-token API scan (Greenhouse/Lever/Ashby)
 /career-ops scan-full      → Legacy full scan (Playwright + WebSearch)
 /career-ops pdf            → Generate ATS-optimized CV
@@ -129,6 +129,10 @@ Career-ops is a single slash command with multiple modes:
 ```
 
 Or just paste a job URL or description directly -- career-ops auto-detects it and runs the full pipeline.
+
+Default low-token behavior:
+- Resume is selected deterministically from `source-resumes/` (`software`, `ml`, `genai`)
+- Tailored PDF generation is skipped unless you explicitly run `/career-ops pdf`
 
 ## How It Works
 

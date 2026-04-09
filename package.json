@@ -9,6 +9,8 @@
     "dedup": "node dedup-tracker.mjs",
     "merge": "node merge-tracker.mjs",
     "pdf": "node generate-pdf.mjs",
+    "resume:select": "node resume-selector.mjs",
+    "resume:test": "node resume-selector-test.mjs",
     "sync-check": "node cv-sync-check.mjs",
     "scan:quick": "node quick-scan.mjs",
     "update:check": "node update-system.mjs check",

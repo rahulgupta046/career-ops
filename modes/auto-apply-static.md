@@ -40,10 +40,18 @@ Unsupported/unknown portals must be skipped and marked as manual-required.
 6. Fill deterministic fields from profile:
    - name, email, phone, location, LinkedIn, work authorization/sponsorship
 7. Generate concise English responses for free-text fields using report + CV proof points.
-8. Upload resume/cv artifact available in current workflow.
+8. Select and upload prebuilt resume artifact:
+   - Run:
+
+```bash
+node resume-selector.mjs --title "{role_title}" --jd-file /tmp/jd.txt
+```
+
+   - Upload selected file from `source-resumes/`.
+   - Do not run tailored PDF generation in this mode unless user explicitly requests `/career-ops pdf`.
 9. Submit form only if all required fields are satisfied and no blocker is present.
 10. Update tracker:
-   - success -> `Applied`
+   - success -> `Applied` with note `resume: source-resumes/{file}`
    - skipped/blocked -> keep canonical status and add note:
      - `manual_required:unsupported_portal`
      - `manual_required:captcha_or_blocker`

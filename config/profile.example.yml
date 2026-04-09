@@ -72,6 +72,12 @@ location:
 
 automation:
   scan_mode: "quick_api"
+  resume_strategy: "prebuilt"
+  prebuilt_resumes:
+    software: "source-resumes/backend_sde.pdf"
+    ml: "source-resumes/ml_infra.pdf"
+    genai: "source-resumes/genai_platform.pdf"
+    default: "ml"
   auto_apply_static:
     enabled: false
     min_score: 4.0

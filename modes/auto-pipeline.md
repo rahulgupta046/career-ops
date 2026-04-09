@@ -22,8 +22,26 @@ Ejecutar exactamente igual que el modo `oferta` (leer `modes/oferta.md` para tod
 ## Paso 2 — Guardar Report .md
 Guardar la evaluación completa en `reports/{###}-{company-slug}-{YYYY-MM-DD}.md` (ver formato en `modes/oferta.md`).
 
-## Paso 3 — Generar PDF
-Ejecutar el pipeline completo de `pdf` (leer `modes/pdf.md`).
+## Paso 3 — Seleccionar Resume Prebuilt (default low-token)
+
+Por defecto, NO generar PDF tailor-made por oferta.
+
+1. Seleccionar el resume con reglas determinísticas (sin LLM extra):
+
+```bash
+node resume-selector.mjs --title "{role_title}" --jd-file /tmp/jd.txt
+```
+
+2. Usar el archivo seleccionado en `source-resumes/`:
+   - `backend_sde.pdf` (software)
+   - `ml_infra.pdf` (ml)
+   - `genai_platform.pdf` (genai)
+
+3. Guardar en el report:
+   - `**Resume Artifact:** source-resumes/{file}`
+   - `**Resume Profile:** software|ml|genai`
+
+4. Solo si el usuario pide explícitamente CV tailor-made, ejecutar modo `pdf`.
 
 ## Paso 4 — Draft Application Answers (solo si score >= 4.5)
 
@@ -62,6 +80,8 @@ Si el score final es >= 4.5, generar borrador de respuestas para el formulario d
 **Idioma**: Siempre en el idioma del JD (EN default). Aplicar `/tech-translate`.
 
 ## Paso 5 — Actualizar Tracker
-Registrar en `data/applications.md` con todas las columnas incluyendo Report y PDF en ✅.
+Registrar en `data/applications.md` con todas las columnas incluyendo Report y PDF en ✅, y nota:
+
+`resume: source-resumes/{file}`
 
 **Si algún paso falla**, continuar con los siguientes y marcar el paso fallido como pendiente en el tracker.
