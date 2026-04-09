@@ -78,7 +78,9 @@ When using [OpenCode](https://opencode.ai), the following slash commands are ava
 | `/career-ops-project` | `/career-ops project` | Evaluate portfolio project idea |
 | `/career-ops-tracker` | `/career-ops tracker` | Application status overview |
 | `/career-ops-apply` | `/career-ops apply` | Live application assistant |
-| `/career-ops-scan` | `/career-ops scan` | Scan portals for new offers |
+| `/career-ops-auto-apply-static` | `/career-ops auto-apply-static` | Auto-submit static ATS forms (Greenhouse/Lever/Ashby) |
+| `/career-ops-scan` | `/career-ops scan` | Quick low-token API scan (Greenhouse/Lever/Ashby) |
+| `/career-ops-scan-full` | `/career-ops scan-full` | Legacy full scan (Playwright + WebSearch) |
 | `/career-ops-batch` | `/career-ops batch` | Batch processing with parallel workers |
 | `/career-ops-patterns` | `/career-ops patterns` | Analyze rejection patterns and improve targeting |
 
@@ -156,7 +158,8 @@ Store any insights the user shares in `config/profile.yml` (under narrative), `m
 Once all files exist, confirm:
 > "You're all set! You can now:
 > - Paste a job URL to evaluate it
-> - Run `/career-ops scan` (or `/career-ops-scan` if using OpenCode) to search portals
+> - Run `/career-ops scan` for quick low-token API scanning
+> - Run `/career-ops scan-full` for legacy deep scanning
 > - Run `/career-ops` to see all commands
 >
 > Everything is customizable — just ask me to change anything.
@@ -214,7 +217,9 @@ Default modes are in `modes/` (English). Additional language-specific modes are 
 | Evaluates portfolio project | `project` |
 | Asks about application status | `tracker` |
 | Fills out application form | `apply` |
-| Searches for new offers | `scan` |
+| Wants static ATS auto-submit | `auto-apply-static` |
+| Searches for new offers (quick low-token) | `scan` |
+| Asks for legacy deep scan | `scan-full` |
 | Processes pending URLs | `pipeline` |
 | Batch processes offers | `batch` |
 | Asks about rejection patterns or wants to improve targeting | `patterns` |
@@ -231,7 +236,7 @@ Default modes are in `modes/` (English). Additional language-specific modes are 
 
 **This system is designed for quality, not quantity.** The goal is to help the user find and apply to roles where there is a genuine match -- not to spam companies with mass applications.
 
-- **NEVER submit an application without the user reviewing it first.** Fill forms, draft answers, generate PDFs -- but always STOP before clicking Submit/Send/Apply. The user makes the final call.
+- **Default is review-first.** Do not submit by default. The only exception is explicit `/career-ops auto-apply-static`, which allows controlled auto-submit for static ATS pages (Greenhouse/Lever/Ashby) with score gate `>= 4.0/5`.
 - **Strongly discourage low-fit applications.** If a score is below 4.0/5, explicitly recommend against applying. The user's time and the recruiter's time are both valuable. Only proceed if the user has a specific reason to override the score.
 - **Quality over speed.** A well-targeted application to 5 companies beats a generic blast to 50. Guide the user toward fewer, better applications.
 - **Respect recruiters' time.** Every application a human reads costs someone's attention. Only send what's worth reading.

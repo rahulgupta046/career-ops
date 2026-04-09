@@ -25,7 +25,9 @@ Determine the mode from `{{mode}}`:
 | `tracker` | `tracker` |
 | `pipeline` | `pipeline` |
 | `apply` | `apply` |
+| `auto-apply-static` | `auto-apply-static` |
 | `scan` | `scan` |
+| `scan-full` | `scan-full` |
 | `batch` | `batch` |
 | `patterns` | `patterns` |
 
@@ -54,7 +56,9 @@ Available commands:
   /career-ops project   → Evaluate portfolio project idea
   /career-ops tracker   → Application status overview
   /career-ops apply     → Live application assistant (reads form + generates answers)
-  /career-ops scan      → Scan portals and discover new offers
+  /career-ops auto-apply-static → Auto-submit static ATS forms (Greenhouse/Lever/Ashby)
+  /career-ops scan      → Quick low-token API scan (Greenhouse/Lever/Ashby)
+  /career-ops scan-full → Legacy full scan (Playwright + WebSearch)
   /career-ops batch     → Batch processing with parallel workers
   /career-ops patterns  → Analyze rejection patterns and improve targeting
 
@@ -71,7 +75,7 @@ After determining the mode, load the necessary files before executing:
 ### Modes that require `_shared.md` + their mode file:
 Read `modes/_shared.md` + `modes/{mode}.md`
 
-Applies to: `auto-pipeline`, `oferta`, `ofertas`, `pdf`, `contacto`, `apply`, `pipeline`, `scan`, `batch`
+Applies to: `auto-pipeline`, `oferta`, `ofertas`, `pdf`, `contacto`, `apply`, `auto-apply-static`, `pipeline`, `scan`, `scan-full`, `batch`
 
 ### Standalone modes (only their mode file):
 Read `modes/{mode}.md`
@@ -79,7 +83,7 @@ Read `modes/{mode}.md`
 Applies to: `tracker`, `deep`, `training`, `project`, `patterns`
 
 ### Modes delegated to subagent:
-For `scan`, `apply` (with Playwright), and `pipeline` (3+ URLs): launch as Agent with the content of `_shared.md` + `modes/{mode}.md` injected into the subagent prompt.
+For `scan-full`, `apply` (with Playwright), `auto-apply-static`, and `pipeline` (3+ URLs): launch as Agent with the content of `_shared.md` + `modes/{mode}.md` injected into the subagent prompt.
 
 ```
 Agent(

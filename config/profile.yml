@@ -1,0 +1,78 @@
+# Career-Ops Profile Configuration
+# Migrated from job-autobot on 2026-04-08.
+
+candidate:
+  full_name: "Rahul Gupta"
+  email: "gupta.rahul7425@gmail.com"
+  phone: "+1 (812) 778-5987"
+  location: "Sunnyvale, California, United States"
+  linkedin: "https://www.linkedin.com/in/rahulgupta046/"
+  portfolio_url: ""
+  github: "https://github.com/rahulgupta046"
+  twitter: ""
+
+target_roles:
+  primary:
+    - "Machine Learning Engineer"
+    - "ML Infrastructure Engineer"
+    - "Generative AI Engineer"
+    - "Backend Engineer"
+  archetypes:
+    - name: "ML Infrastructure Engineer"
+      level: "Mid"
+      fit: "primary"
+    - name: "Generative AI / LLM Engineer"
+      level: "Mid"
+      fit: "primary"
+    - name: "Backend Platform Engineer"
+      level: "Mid"
+      fit: "secondary"
+    - name: "Ranking / Recommendation ML Engineer"
+      level: "Mid"
+      fit: "primary"
+
+narrative:
+  headline: "Machine Learning and Software Engineer building production AI systems at scale"
+  exit_story: "SDE at Amazon focused on ranking systems and ML infrastructure, now targeting ML Infra, GenAI, and backend platform roles where I can ship measurable production impact."
+  superpowers:
+    - "Production-scale ranking and recommendation systems"
+    - "Distributed PySpark data and feature engineering pipelines"
+    - "LLM and RAG integration for real products"
+    - "Performance and reliability optimization for ML systems"
+  proof_points:
+    - name: "Amazon Ranking Systems"
+      url: ""
+      hero_metric: "10,000+ QPS across global storefront ranking workflows"
+    - name: "Training Pipeline Optimization"
+      url: ""
+      hero_metric: "~70% runtime reduction (about 9h to about 2.5h)"
+    - name: "Pipeline Reliability"
+      url: ""
+      hero_metric: "60%+ reduction in recurring ML pipeline incidents"
+    - name: "Sherpa Analytics Semantic Search"
+      url: ""
+      hero_metric: "1M+ record backend with 50%+ lookup latency reduction"
+    - name: "Embedding and Indexing Optimization"
+      url: ""
+      hero_metric: "30% reduction in embedding and indexing pipeline time"
+
+compensation:
+  target_range: "Open to market-competitive total compensation in USD"
+  currency: "USD"
+  minimum: "Not pre-committed; role and scope dependent"
+  location_flexibility: "Remote preferred; open to hybrid in California or New York"
+
+location:
+  country: "United States"
+  city: "Sunnyvale"
+  timezone: "PST"
+  visa_status: "Requires continued employer sponsorship"
+  onsite_availability: "Open to hybrid in California or New York; not willing to relocate outside preferred locations"
+
+automation:
+  scan_mode: "quick_api"
+  auto_apply_static:
+    enabled: true
+    min_score: 4.0
+    portals: ["greenhouse", "lever", "ashby"]
+    skip_non_static: true

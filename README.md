@@ -49,7 +49,7 @@ Career-Ops turns any AI coding CLI into a full job search command center. Instea
 - **Processes in batch** -- evaluate 10+ offers in parallel with sub-agents
 - **Tracks everything** in a single source of truth with integrity checks
 
-> **Important: This is NOT a spray-and-pray tool.** Career-ops is a filter -- it helps you find the few offers worth your time out of hundreds. The system strongly recommends against applying to anything scoring below 4.0/5. Your time is valuable, and so is the recruiter's. Always review before submitting.
+> **Important: This is NOT a spray-and-pray tool.** Career-ops is a filter -- it helps you find the few offers worth your time out of hundreds. The system strongly recommends against applying to anything scoring below 4.0/5. Your time is valuable, and so is the recruiter's. Default flow is review-first; auto-submit is only for explicit `/career-ops auto-apply-static`.
 
 Career-ops is agentic: Claude Code navigates career pages with Playwright, evaluates fit by reasoning about your CV vs the job description (not keyword matching), and adapts your resume per listing.
 
@@ -69,7 +69,7 @@ Built by someone who used it to evaluate 740+ job offers, generate 100+ tailored
 | **Portal Scanner** | 45+ companies pre-configured (Anthropic, OpenAI, ElevenLabs, Retool, n8n...) + custom queries across Ashby, Greenhouse, Lever, Wellfound |
 | **Batch Processing** | Parallel evaluation with `claude -p` workers |
 | **Dashboard TUI** | Terminal UI to browse, filter, and sort your pipeline |
-| **Human-in-the-Loop** | AI evaluates and recommends, you decide and act. The system never submits an application -- you always have the final call |
+| **Controlled Auto-Apply** | Manual-by-default, with optional static ATS auto-submit mode (`/career-ops auto-apply-static`) for Greenhouse/Lever/Ashby |
 | **Pipeline Integrity** | Automated merge, dedup, status normalization, health checks |
 
 ## Quick Start
@@ -114,11 +114,13 @@ Career-ops is a single slash command with multiple modes:
 ```
 /career-ops                → Show all available commands
 /career-ops {paste a JD}   → Full auto-pipeline (evaluate + PDF + tracker)
-/career-ops scan           → Scan portals for new offers
+/career-ops scan           → Quick low-token API scan (Greenhouse/Lever/Ashby)
+/career-ops scan-full      → Legacy full scan (Playwright + WebSearch)
 /career-ops pdf            → Generate ATS-optimized CV
 /career-ops batch          → Batch evaluate multiple offers
 /career-ops tracker        → View application status
 /career-ops apply          → Fill application forms with AI
+/career-ops auto-apply-static → Auto-submit static ATS forms (score-gated)
 /career-ops pipeline       → Process pending URLs
 /career-ops contacto       → LinkedIn outreach message
 /career-ops deep           → Deep company research

@@ -1,0 +1,153 @@
+# Portal Scanner Configuration
+# Customized for Rahul Gupta (ML Infra / GenAI / Backend focus).
+
+title_filter:
+  positive:
+    - "Machine Learning Engineer"
+    - "ML Infrastructure"
+    - "ML Platform"
+    - "Generative AI"
+    - "GenAI"
+    - "LLM"
+    - "RAG"
+    - "AI Engineer"
+    - "Backend Engineer"
+    - "Platform Engineer"
+    - "Recommendation"
+    - "Ranking"
+    - "Data Pipeline"
+    - "MLOps"
+    - "LLMOps"
+  negative:
+    - "Intern"
+    - "Internship"
+    - "Junior"
+    - "Principal Scientist"
+    - "Vice President"
+    - "Chief"
+    - "Sales"
+    - "Account Executive"
+    - "Nurse"
+    - "Physician"
+    - "Dentist"
+    - "Real Estate"
+    - "Truck Driver"
+    - "Electrician"
+  seniority_boost:
+    - "Senior"
+    - "Staff"
+    - "Lead"
+
+search_queries:
+  - name: Ashby - ML Infra Remote US
+    query: 'site:jobs.ashbyhq.com "ML Infrastructure Engineer" OR "Machine Learning Engineer" "United States" OR remote'
+    enabled: true
+
+  - name: Greenhouse - GenAI / LLM US
+    query: 'site:job-boards.greenhouse.io OR site:boards.greenhouse.io "Generative AI Engineer" OR "LLM Engineer" "United States" OR remote'
+    enabled: true
+
+  - name: Lever - Backend + ML Platform
+    query: 'site:jobs.lever.co "Backend Engineer" OR "ML Platform Engineer" remote "United States"'
+    enabled: true
+
+  - name: Wellfound - Early Stage ML Engineer
+    query: 'site:wellfound.com "Machine Learning Engineer" OR "AI Engineer" remote "United States"'
+    enabled: true
+
+  - name: Workable - ML / GenAI
+    query: 'site:apply.workable.com "Machine Learning" OR "Generative AI" "United States" remote'
+    enabled: true
+
+  - name: OpenAI Careers
+    query: 'site:openai.com/careers "Machine Learning" OR "Backend" OR "Infrastructure"'
+    enabled: true
+
+  - name: LinkedIn US ML Infra
+    query: 'site:linkedin.com/jobs "ML Infrastructure Engineer" "California" OR "New York" OR remote'
+    enabled: true
+
+tracked_companies:
+  - name: OpenAI
+    careers_url: https://openai.com/careers
+    scan_method: websearch
+    scan_query: 'site:openai.com/careers "Machine Learning" OR "Backend" OR "Infrastructure"'
+    enabled: true
+
+  - name: Anthropic
+    provider: greenhouse
+    board_slug: anthropic
+    careers_url: https://job-boards.greenhouse.io/anthropic
+    api: https://boards-api.greenhouse.io/v1/boards/anthropic/jobs
+    enabled: true
+
+  - name: Cohere
+    provider: ashby
+    board_slug: cohere
+    careers_url: https://jobs.ashbyhq.com/cohere
+    scan_method: websearch
+    scan_query: 'site:jobs.ashbyhq.com/cohere "Machine Learning" OR "Infrastructure"'
+    enabled: true
+
+  - name: LangChain
+    provider: ashby
+    board_slug: langchain
+    careers_url: https://jobs.ashbyhq.com/langchain
+    scan_method: websearch
+    scan_query: 'site:jobs.ashbyhq.com/langchain "AI" OR "Platform" OR "Backend"'
+    enabled: true
+
+  - name: Pinecone
+    provider: ashby
+    board_slug: pinecone
+    careers_url: https://jobs.ashbyhq.com/pinecone
+    scan_method: websearch
+    scan_query: 'site:jobs.ashbyhq.com/pinecone "Machine Learning" OR "Backend"'
+    enabled: true
+
+  - name: Databricks
+    careers_url: https://www.databricks.com/company/careers/open-positions
+    scan_method: websearch
+    scan_query: 'site:databricks.com/careers "Machine Learning Engineer" OR "Platform Engineer"'
+    enabled: true
+
+  - name: Snowflake
+    careers_url: https://careers.snowflake.com/us/en/search-results
+    scan_method: websearch
+    scan_query: 'site:careers.snowflake.com "Machine Learning" OR "Data Platform"'
+    enabled: true
+
+  - name: Vercel
+    provider: greenhouse
+    board_slug: vercel
+    careers_url: https://job-boards.greenhouse.io/vercel
+    api: https://boards-api.greenhouse.io/v1/boards/vercel/jobs
+    enabled: true
+
+  - name: Retool
+    careers_url: https://retool.com/careers
+    scan_method: websearch
+    scan_query: 'site:retool.com/careers "AI" OR "Backend" OR "Platform"'
+    enabled: true
+
+  - name: Glean
+    provider: greenhouse
+    board_slug: gleanwork
+    careers_url: https://job-boards.greenhouse.io/gleanwork
+    api: https://boards-api.greenhouse.io/v1/boards/gleanwork/jobs
+    enabled: true
+
+  - name: Arize AI
+    provider: greenhouse
+    board_slug: arizeai
+    careers_url: https://job-boards.greenhouse.io/arizeai
+    api: https://boards-api.greenhouse.io/v1/boards/arizeai/jobs
+    enabled: true
+
+  - name: Weights & Biases
+    provider: ashby
+    board_slug: wandb
+    careers_url: https://jobs.ashbyhq.com/wandb
+    scan_method: websearch
+    scan_query: 'site:jobs.ashbyhq.com/wandb "Machine Learning" OR "Platform"'
+    enabled: true

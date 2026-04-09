@@ -69,3 +69,11 @@ location:
   visa_status: "No sponsorship needed"
   # For remote roles outside your country:
   # onsite_availability: "1 week/month in any city"
+
+automation:
+  scan_mode: "quick_api"
+  auto_apply_static:
+    enabled: false
+    min_score: 4.0
+    portals: ["greenhouse", "lever", "ashby"]
+    skip_non_static: true

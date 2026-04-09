@@ -7,6 +7,9 @@
 #   3. WebSearch with site: filters (broad discovery, may be stale)
 #
 # IMPORTANT: Each company in tracked_companies MUST have careers_url.
+# Optional (recommended for quick scan):
+#   provider: greenhouse | lever | ashby
+#   board_slug: ATS board slug (for Lever/Ashby/Greenhouse API resolution)
 #
 # HOW TO CUSTOMIZE:
 #   1. Copy this file to portals.yml in the project root
@@ -196,6 +199,8 @@ tracked_companies:
   # -- AI Labs & LLM providers --
 
   - name: Anthropic
+    provider: greenhouse
+    board_slug: anthropic
     careers_url: https://job-boards.greenhouse.io/anthropic
     api: https://boards-api.greenhouse.io/v1/boards/anthropic/jobs
     enabled: true
@@ -233,6 +238,8 @@ tracked_companies:
     enabled: true
 
   - name: ElevenLabs
+    provider: ashby
+    board_slug: elevenlabs
     careers_url: https://jobs.ashbyhq.com/elevenlabs
     scan_method: websearch
     scan_query: 'site:jobs.ashbyhq.com/elevenlabs'

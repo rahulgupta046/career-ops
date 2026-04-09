@@ -146,12 +146,12 @@ Guardar evaluación completa en `reports/{###}-{company-slug}-{YYYY-MM-DD}.md`.
 - Empresa
 - Rol
 - Score: promedio de match (1-5)
-- Estado: `Evaluada`
+- Estado: `Evaluated`
 - PDF: ❌ (o ✅ si auto-pipeline generó PDF)
 - Report: link relativo al report .md (ej: `[001](reports/001-company-2026-01-01.md)`)
 
-**Formato del tracker:**
+**Tracker format:**
 
 ```markdown
-| # | Fecha | Empresa | Rol | Score | Estado | PDF | Report |
+| # | Date | Company | Role | Score | Status | PDF | Report |
 ```

@@ -1,8 +1,8 @@
 ---
-description: Scan job portals and discover new offers
+description: Quick low-token API scan for Greenhouse, Lever, and Ashby
 ---
 
-Scan job portals for new offers using career-ops scan mode.
+Run quick scan mode in career-ops.
 
 Load the career-ops skill:
 ```

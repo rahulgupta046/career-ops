@@ -57,12 +57,14 @@ Then paste a job offer URL or description. Career-ops will automatically evaluat
 | Action | How |
 |--------|-----|
 | Evaluate an offer | Paste a URL or JD text |
-| Search for offers | `/career-ops scan` |
+| Search for offers (quick low-token) | `/career-ops scan` |
+| Search for offers (legacy full) | `/career-ops scan-full` |
 | Process pending URLs | `/career-ops pipeline` |
 | Generate a PDF | `/career-ops pdf` |
 | Batch evaluate | `/career-ops batch` |
 | Check tracker status | `/career-ops tracker` |
 | Fill application form | `/career-ops apply` |
+| Auto-submit static ATS | `/career-ops auto-apply-static` |
 
 ## Verify Setup
 
