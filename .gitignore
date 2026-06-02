@@ -3,6 +3,9 @@ cv.md
 data/applications.md
 data/pipeline.md
 data/scan-history.tsv
+data/applications_queue.csv
+data/scanned_jobs.json
+data/jobs*.sqlite
 data/parser-output/**/*.json
 !data/parser-output/.gitkeep
 !data/parser-output/**/.gitkeep
@@ -47,4 +50,3 @@ bun.lock
 .claude/settings.local.json
 .claude/memory/
 career-dashboard
-package-lock.json

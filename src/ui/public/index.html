@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Finder Queue</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Job Finder MVP</p>
+        <h1>Application Queue</h1>
+      </div>
+      <div class="topbar-actions">
+        <span id="job-count" class="count"></span>
+        <button id="refresh" class="secondary-button" type="button">Refresh</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="toolbar" aria-label="Queue controls">
+        <label class="search-field">
+          <span>Search</span>
+          <input id="search" type="search" placeholder="Company, title, location, or keyword">
+        </label>
+        <label>
+          <span>Minimum score</span>
+          <select id="minimum-score">
+            <option value="70">70+</option>
+            <option value="80" selected>80+</option>
+            <option value="85">85+</option>
+            <option value="90">90+</option>
+          </select>
+        </label>
+        <label>
+          <span>Posted within</span>
+          <select id="posted-within">
+            <option value="1">1 day</option>
+            <option value="3">3 days</option>
+            <option value="7" selected>7 days</option>
+          </select>
+        </label>
+        <label class="check-label">
+          <input id="sponsorship-only" type="checkbox">
+          <span>Sponsorship signals only</span>
+        </label>
+      </section>
+
+      <section class="content-grid">
+        <section class="queue-section" aria-labelledby="queue-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Ranked locally</p>
+              <h2 id="queue-heading">Best matches</h2>
+            </div>
+            <p id="status" class="status" aria-live="polite"></p>
+          </div>
+          <div id="jobs" class="jobs"></div>
+        </section>
+
+        <aside class="profile-section" aria-labelledby="profile-heading">
+          <p class="eyebrow">Reusable autofill</p>
+          <h2 id="profile-heading">Candidate profile</h2>
+          <p class="subtle">Prepare fills obvious fields and leaves the browser open for review. It never submits.</p>
+          <div id="profile" class="profile-list"></div>
+        </aside>
+      </section>
+    </main>
+
+    <template id="job-template">
+      <article class="job">
+        <div class="job-score"></div>
+        <div class="job-main">
+          <div class="job-title-row">
+            <div>
+              <p class="job-company"></p>
+              <h3 class="job-title"></h3>
+            </div>
+            <span class="ats"></span>
+          </div>
+          <p class="job-location"></p>
+          <p class="job-posted"></p>
+          <p class="job-reason"></p>
+          <div class="keyword-row"></div>
+          <div class="job-actions">
+            <a class="primary-button apply-link" target="_blank" rel="noreferrer">Open application</a>
+            <button class="secondary-button prepare-button" type="button">Prepare fields</button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

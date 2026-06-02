@@ -24,14 +24,32 @@ function assertGreenhouseUrl(url) {
   return url;
 }
 
+function withContent(url) {
+  const parsed = new URL(url);
+  parsed.searchParams.set('content', 'true');
+  return parsed.href;
+}
+
+function stripHtml(value) {
+  return String(value || '')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function resolveApiUrl(entry) {
   if (entry.api) {
     assertGreenhouseUrl(entry.api);
-    return entry.api;
+    return withContent(entry.api);
   }
   const url = entry.careers_url || '';
   const match = url.match(/job-boards(?:\.eu)?\.greenhouse\.io\/([^/?#]+)/);
-  if (match) return `https://boards-api.greenhouse.io/v1/boards/${match[1]}/jobs`;
+  if (match) return `https://boards-api.greenhouse.io/v1/boards/${match[1]}/jobs?content=true`;
+  if (entry.slug) return `https://boards-api.greenhouse.io/v1/boards/${entry.slug}/jobs?content=true`;
   return null;
 }
 
@@ -59,8 +77,13 @@ export default {
     return jobs.filter(j => j.absolute_url).map(j => ({
       title: j.title || '',
       url: j.absolute_url,
+      job_url: j.absolute_url,
       company: entry.name,
       location: j.location?.name || '',
+      description: stripHtml(j.content || ''),
+      ats: 'greenhouse',
+      job_id: String(j.id || ''),
+      posted_at: j.updated_at || '',
     }));
   },
 };

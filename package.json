@@ -1,42 +1,25 @@
 {
-  "name": "career-ops",
-  "version": "1.8.1",
-  "description": "AI-powered job search pipeline built on Claude Code",
+  "name": "job-finder-mvp",
+  "version": "0.1.0",
+  "description": "Review-first ATS job finder and application prep MVP",
+  "type": "module",
   "scripts": {
-    "doctor": "node doctor.mjs",
-    "verify": "node verify-pipeline.mjs",
-    "normalize": "node normalize-statuses.mjs",
-    "dedup": "node dedup-tracker.mjs",
-    "merge": "node merge-tracker.mjs",
-    "pdf": "node generate-pdf.mjs",
-    "sync-check": "node cv-sync-check.mjs",
-    "update:check": "node update-system.mjs check",
-    "update": "node update-system.mjs apply",
-    "rollback": "node update-system.mjs rollback",
-    "liveness": "node check-liveness.mjs",
-    "scan": "node scan.mjs",
-    "patterns": "node analyze-patterns.mjs",
-    "gemini:eval": "node gemini-eval.mjs"
+    "find": "node src/main.mjs find",
+    "ui": "node src/ui/server.mjs",
+    "prepare": "node src/npm_prepare.mjs",
+    "apply": "node src/main.mjs apply",
+    "verify": "node verify-mvp.mjs"
   },
   "keywords": [
-    "ai",
     "job-search",
-    "claude-code",
-    "career",
-    "career-ops",
-    "careerops",
-    "automation"
+    "ats",
+    "greenhouse",
+    "lever",
+    "ashby"
   ],
-  "author": "Santiago Fernández de Valderrama <hi@santifer.io> (https://santifer.io)",
-  "homepage": "https://santifer.io",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/santifer/career-ops"
-  },
   "license": "MIT",
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
-    "dotenv": "^17.0.0",
+    "@anthropic-ai/sdk": "^0.99.0",
     "js-yaml": "^4.1.1",
     "playwright": "^1.58.1"
   }

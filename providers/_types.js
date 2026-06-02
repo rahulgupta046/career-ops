@@ -10,21 +10,25 @@
 // Files prefixed with _ are never loaded as providers by scan.mjs.
 
 /**
- * Normalized job posting — the unit of currency throughout the scanner.
+ * Normalized job posting.
  *
  * @typedef {object} Job
- * @property {string} title    Required, non-empty after trim.
- * @property {string} url      Required, absolute URL — used as the dedup key.
- * @property {string} company  May be empty when the source can't expose it
- *                             at the list-page level; populated downstream.
- * @property {string} location May be empty.
+ * @property {string} title       Required, non-empty after trim.
+ * @property {string} url         Required, absolute URL.
+ * @property {string} job_url     Required, absolute URL used by the queue.
+ * @property {string} company     Company name.
+ * @property {string} location    May be empty.
+ * @property {string} description May be empty.
+ * @property {string} ats         greenhouse, lever, or ashby.
+ * @property {string} job_id      Provider job id, when available.
+ * @property {string} posted_at   ISO date from the provider, when available.
  */
 
 /**
- * A single `tracked_companies` entry from `portals.yml`.
+ * A single company entry from `config/companies.yml`.
  *
  * Provider-specific fields are opaque to scan.mjs and validated by the
- * provider itself. Examples in current providers: `api`, `careers_url`.
+ * provider itself. Examples in current providers: `api`, `slug`, `careers_url`.
  * Providers read these directly off the entry object — no schema enforcement
  * at the framework level.
  *
@@ -32,7 +36,9 @@
  * @property {string}             name             User-facing label; appears in logs and placeholders.
  * @property {boolean}            [enabled]        Default: true.
  * @property {string}             [careers_url]    Public listing URL; consumed by detect().
- * @property {string}             [provider]       Explicit provider id — bypasses detect().
+ * @property {string}             [ats]            Explicit provider id.
+ * @property {string}             [provider]       Alias for ats.
+ * @property {string}             [slug]           ATS board slug.
  * @property {('http')}           [transport]      Default: 'http'. Reserved for future transports.
  */
 

@@ -1,0 +1,64 @@
+target_roles:
+  - Software Engineer
+  - Backend Engineer
+  - Machine Learning Engineer
+  - AI Engineer
+  - Forward Deployed Engineer
+
+locations:
+  - Remote
+  - New York
+  - San Francisco bay area
+  - Seattle
+  - Dallas
+  - Boston
+  - United States
+
+required_keywords:
+  - python
+  - sql
+  - aws
+  - spark
+  - databricks
+  - backend
+  - distributed systems
+  - machine learning
+  - llm
+  - rag
+
+negative_keywords:
+  - senior
+  - sr.
+  - staff
+  - senior staff
+  - principal
+  - lead
+  - manager
+  - director
+  - unpaid
+  - internship
+  - contract only
+  - clearance required
+
+seniority_exclusion_keywords:
+  - senior
+  - sr.
+  - staff
+  - principal
+  - lead
+  - manager
+  - director
+
+sponsorship_keywords:
+  - visa
+  - h1b
+  - h-1b
+  - sponsorship
+  - work authorization
+  - immigration
+
+score_threshold: 70
+max_experience_years: 3
+max_posted_age_days: 7
+include_jobs_without_posted_at: false
+resume_path: /Users/rahulgupta/Documents/resumesss/new/001_Rahul_Resume_AI.pdf
