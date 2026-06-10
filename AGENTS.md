@@ -1,14 +1,16 @@
-# Job Finder MVP for Codex
+# Local Application Workbench
 
-This repo is no longer the full career-ops framework. It is a narrow job finder
-and review-first application prep tool.
+This repo is a narrow local job discovery, ATS analysis, and review-first
+application assistant.
 
 Rules:
-- Submit applications only when the user explicitly asks for it and the command
-  uses `--confirm`.
-- Before submit, validate that visible required fields are filled and stop on
-  CAPTCHA, login, missing required fields, or unclear blockers.
-- Do not add broad career-ops modes back unless explicitly requested.
-- Keep user targeting in `config/search_rules.yml`, `config/companies.yml`, and `config/candidate_profile.yml`.
-- Keep outputs under `data/`.
-- Use `npm run find`, `npm run prepare`, and `npm run verify`.
+- Keep targeting in `config/search_rules.yml`, `config/sources.yml`, and
+  `config/candidate_profile.yml`.
+- Keep generated databases, exports, logs, browser profiles, integration
+  checkouts, and Python environments ignored by Git.
+- Use `npm run scan`, `npm run ui`, `npm run prepare`, `npm run apply`,
+  `npm run export`, and `npm run verify`.
+- Fill only verified profile fields.
+- Submit only after preparation validation, a one-time review token, and
+  explicit `--confirm`.
+- Never submit from scans, refresh actions, scheduled tasks, or bulk actions.

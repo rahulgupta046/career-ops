@@ -1,0 +1,20 @@
+ever_jobs:
+  enabled: true
+  repository: https://github.com/ever-jobs/ever-jobs.git
+  commit: 3bbe08a
+  directory: .integrations/ever-jobs
+  base_url: http://127.0.0.1:3001
+
+jobspy:
+  enabled: true
+  package: python-jobspy==1.1.82
+  python: .venv/bin/python
+  sites:
+    - indeed
+    - google
+
+claude:
+  enabled: true
+  max_reviews_per_scan: 20
+  minimum_ats_score: 75
+  minimum_rank_score: 75

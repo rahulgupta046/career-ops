@@ -5,6 +5,14 @@ data/pipeline.md
 data/scan-history.tsv
 data/applications_queue.csv
 data/scanned_jobs.json
+data/job_finder.sqlite*
+data/archive-*/
+data/exports/*
+data/logs/*
+data/*.pid
+data/browser-profile/*
+.integrations/
+.venv/
 data/jobs*.sqlite
 data/parser-output/**/*.json
 !data/parser-output/.gitkeep

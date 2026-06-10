@@ -1,67 +1,81 @@
-# Job Finder MVP
+# Local Application Workbench
 
-This repo is a focused, review-first job finder. It fetches public ATS postings,
-scores them locally, optionally asks Claude to review only high-score matches,
-and writes a queue CSV. It does not submit applications.
+A local job discovery, ATS analysis, and review-first application assistant.
 
-## Commands
+## Workflow
 
 ```bash
 npm install
-npm run find
-npm run find -- --dry-run
-npm run find -- --no-claude
-npm run find -- --no-claude --rescan
+npm run setup
 npm run ui
-npm run prepare -- --top 10
-npm run apply -- --top 1 --confirm
-npm run verify
 ```
 
-## Local UI
+Open `http://127.0.0.1:4173`, review the PDF-extracted profile, and click
+**Confirm extracted resume**. Then use **Refresh jobs** or:
 
-Run `npm run find -- --no-claude`, then run `npm run ui` and open
-`http://127.0.0.1:4173`.
+```bash
+npm run scan -- --no-claude
+npm run scan -- --dry-run
+npm run scan -- --rescore
+npm run export
+```
 
-The local dashboard reads `data/applications_queue.csv`. It supports text and
-score filters, sponsorship-signal filtering, direct application links, profile
-copy buttons, and a review-first **Prepare fields** action. Prepare opens a
-Playwright browser, uploads the configured resume, fills obvious verified
-profile fields, and leaves the page open. The dashboard never submits an
-application.
+Discovery uses the pinned Ever Jobs sidecar on `127.0.0.1:3001` plus selective
+Indeed and Google searches through JobSpy after setup.
 
-Most ATS portals do not support personal data encoded into an application URL.
-The direct link plus the Prepare action is the lightweight equivalent: discovery
-and ranking happen once, while field filling runs only for jobs you select.
+On a machine without Docker, the no-Docker Ever Jobs sidecar can be used after
+setup:
 
-## Config
+```bash
+npm run integrations:install
+npm run integrations:start:local
+npm run integrations:stop:local
+```
 
-- `config/search_rules.yml` controls target roles, locations, keywords, score threshold, and resume path.
-- `config/companies.yml` lists Greenhouse, Lever, and Ashby company boards.
-- `config/candidate_profile.yml` stores the compressed profile and form-fill contact fields.
+Docker remains available only as an optional isolation mode:
 
-Fields listed under `unverified_fields` remain visible in the UI but are not
-copied or autofilled. Remove a key from that list only after confirming its
-value.
+```bash
+npm run integrations:start
+npm run integrations:stop
+```
 
-`max_posted_age_days` defaults to `7`, so the queue only keeps jobs posted
-within the last week. `data/scanned_jobs.json` records ATS job IDs and URL
-fallbacks. Later scans still fetch portal indexes to discover new jobs, but
-skip scoring and Claude review for previously seen postings. Use `--rescan`
-after changing scoring rules when you intentionally want to reevaluate them.
+## Applications
 
-## Output
+The dashboard shows recent qualified jobs with ATS tier scores, missing skills,
+sponsorship signals, source health, and application state.
 
-`npm run find` writes `data/applications_queue.csv` with:
+`Prepare fields` opens a persistent Playwright browser profile, uploads the
+fixed resume PDF, fills verified fields, validates visible required fields, and
+returns a one-time review token. It never submits.
+
+After reviewing the browser form, submit from the UI or run:
+
+```bash
+npm run prepare -- --job <id>
+npm run apply -- --job <id> --token <review-token> --confirm
+```
+
+Submission stops on missing required fields, CAPTCHA, login, or unclear
+blockers. Scheduled scans never open a browser or submit.
+
+## Data
+
+SQLite is the source of truth:
 
 ```text
-company,title,location,ats_type,job_url,posted_at,score,reason,matched_keywords,sponsorship_signal,apply_mode,status
+data/job_finder.sqlite
 ```
 
-## Safety
+Generated databases, exports, logs, browser profiles, `.venv`, and cloned
+integrations are ignored by Git.
 
-`npm run prepare` opens job pages and fills obvious fields where possible.
+## Scheduler
 
-`npm run apply -- --top N --confirm` fills, validates required visible fields,
-and submits only when validation passes. If required fields, CAPTCHA, login, or
-other blockers remain, it stops without submitting.
+Install or remove the macOS 08:00 local-time scan:
+
+```bash
+npm run scheduler:install
+npm run scheduler:remove
+```
+
+Run `npm run verify` after changes.

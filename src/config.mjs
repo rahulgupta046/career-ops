@@ -3,10 +3,12 @@ import yaml from 'js-yaml';
 
 export const PATHS = {
   searchRules: 'config/search_rules.yml',
-  companies: 'config/companies.yml',
   candidateProfile: 'config/candidate_profile.yml',
-  queue: 'data/applications_queue.csv',
-  scannedJobs: 'data/scanned_jobs.json',
+  database: 'data/job_finder.sqlite',
+  resume: 'config/resume.yml',
+  sources: 'config/sources.yml',
+  integrations: 'config/integrations.yml',
+  exportQueue: 'data/exports/applications_queue.csv',
 };
 
 export function readYaml(path, fallback = {}) {
@@ -16,12 +18,10 @@ export function readYaml(path, fallback = {}) {
 
 export function loadConfig() {
   const searchRules = readYaml(PATHS.searchRules);
-  const companiesConfig = readYaml(PATHS.companies, { companies: [] });
   const candidateProfile = readYaml(PATHS.candidateProfile);
 
   return {
     searchRules,
-    companies: (companiesConfig.companies || []).filter(company => company.enabled !== false),
     candidateProfile,
   };
 }

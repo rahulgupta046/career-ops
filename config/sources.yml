@@ -1,0 +1,34 @@
+board_searches:
+  - term: '"software engineer" python backend'
+    location: United States
+  - term: '"machine learning engineer" python'
+    location: United States
+  - term: '"AI engineer" python llm'
+    location: United States
+  - term: '"data engineer" python sql spark'
+    location: United States
+
+ever_jobs_company_sources:
+  - amazon
+  - anthropic
+  - apple
+  - asana
+  - coinbase
+  - databricks
+  - doordash
+  - dropbox
+  - figma
+  - google
+  - instacart
+  - lyft
+  - microsoft
+  - netflix
+  - nvidia
+  - openai
+  - pinterest
+  - reddit
+  - robinhood
+  - stripe
+  - twilio
+  - uber
+  - vercel

@@ -1,154 +1,149 @@
-const jobsElement = document.querySelector('#jobs');
-const profileElement = document.querySelector('#profile');
-const countElement = document.querySelector('#job-count');
-const statusElement = document.querySelector('#status');
-const template = document.querySelector('#job-template');
-const searchInput = document.querySelector('#search');
-const minimumScore = document.querySelector('#minimum-score');
-const postedWithin = document.querySelector('#posted-within');
-const sponsorshipOnly = document.querySelector('#sponsorship-only');
-
+const $ = selector => document.querySelector(selector);
 let jobs = [];
+let applications = [];
+let selectedId = null;
 
-async function fetchJson(url, options) {
+const api = async (url, options) => {
   const response = await fetch(url, options);
-  const body = await response.json();
-  if (!response.ok) throw new Error(body.error || 'Request failed');
-  return body;
-}
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error);
+  return data;
+};
+const post = (url, value = {}) => api(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(value) });
+const age = date => Math.max(0, Math.floor((Date.now() - Date.parse(date)) / 86400000));
+const parsed = value => { try { return JSON.parse(value || '[]'); } catch { return []; } };
+const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[char]);
+const state = (value, style = value) => `<span class="state ${esc(style)}">${esc(value)}</span>`;
+const skill = value => `<span class="badge">${esc(value)}</span>`;
+const visibleSkills = value => String(value || '').match(/\d+\/\d+ hard skills matched \(\d+%\)/)?.[0] || value || 'ATS keyword analysis available';
 
-function filteredJobs() {
-  const term = searchInput.value.trim().toLowerCase();
-  const threshold = Number(minimumScore.value);
-  const postedCutoff = Date.now() - Number(postedWithin.value) * 86400000;
-  return jobs.filter(job => {
-    const text = [job.company, job.title, job.location, job.matched_keywords].join(' ').toLowerCase();
-    const hasSponsorship = job.sponsorship_signal && job.sponsorship_signal !== 'unknown';
-    return Number(job.score) >= threshold
-      && (!term || text.includes(term))
-      && Date.parse(job.posted_at) >= postedCutoff
-      && (!sponsorshipOnly.checked || hasSponsorship);
-  });
+function status(value) { $('#status').textContent = value; }
+function sourceMatches(job, value) {
+  if (!value) return true;
+  return String(job.source || '').startsWith(`${value}:`) || job.source === value;
 }
-
-function keyword(text, extraClass = '') {
-  const item = document.createElement('span');
-  item.className = `keyword ${extraClass}`.trim();
-  item.textContent = text;
-  return item;
+function filtered() {
+  const term = $('#search').value.toLowerCase();
+  const days = Number($('#days').value);
+  const ats = Number($('#ats').value);
+  const sponsor = $('#sponsor').value;
+  const source = $('#source-filter').value;
+  return jobs.filter(job => [job.company, job.title, job.location].join(' ').toLowerCase().includes(term)
+    && age(job.posted_at) <= days && Number(job.ats_score) >= ats && (!sponsor || job.sponsorship_signal === sponsor)
+    && sourceMatches(job, source));
 }
-
-function postedLabel(value) {
-  if (!value) return 'Posted date unavailable';
-  const date = new Date(value);
-  const ageDays = Math.max(0, Math.floor((Date.now() - date.getTime()) / 86400000));
-  return `Posted ${ageDays === 0 ? 'today' : `${ageDays} day${ageDays === 1 ? '' : 's'} ago`}`;
+function updateStats() {
+  const fresh = jobs.filter(job => age(job.posted_at) <= 7);
+  const sponsor = jobs.filter(job => job.sponsorship_signal === 'positive');
+  const average = jobs.length ? Math.round(jobs.reduce((sum, job) => sum + Number(job.ats_score), 0) / jobs.length) : '--';
+  $('#stat-qualified').textContent = jobs.length;
+  $('#stat-fresh').textContent = fresh.length;
+  $('#stat-sponsor').textContent = sponsor.length;
+  $('#stat-ats').textContent = average;
+  $('#nav-job-count').textContent = jobs.length;
+  $('#nav-app-count').textContent = applications.length;
 }
-
-async function prepare(job, button) {
-  button.disabled = true;
-  statusElement.textContent = `Preparing ${job.company}...`;
-  try {
-    const { result } = await fetchJson('/api/prepare', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ job_url: job.job_url }),
-    });
-    statusElement.textContent = `${result.status}: ${job.company}. Review the opened browser window.`;
-  } catch (error) {
-    statusElement.textContent = `Prepare failed: ${error.message}`;
-  } finally {
-    button.disabled = false;
-  }
-}
-
 function renderJobs() {
-  const visibleJobs = filteredJobs();
-  countElement.textContent = `${visibleJobs.length} of ${jobs.length} jobs`;
-  jobsElement.replaceChildren();
-
-  if (!visibleJobs.length) {
-    const empty = document.createElement('p');
-    empty.className = 'empty';
-    empty.textContent = 'No jobs match these filters.';
-    jobsElement.append(empty);
+  const visible = filtered();
+  $('#job-count').textContent = `${visible.length} role${visible.length === 1 ? '' : 's'}`;
+  if (!visible.length) {
+    $('#jobs').innerHTML = `<div class="empty-state"><span class="empty-icon">⌕</span><h3>No matching roles</h3><p>Refresh discovery or relax the active filters.</p></div>`;
     return;
   }
-
-  for (const job of visibleJobs) {
-    const fragment = template.content.cloneNode(true);
-    fragment.querySelector('.job-score').textContent = job.score;
-    fragment.querySelector('.job-company').textContent = job.company;
-    fragment.querySelector('.job-title').textContent = job.title;
-    fragment.querySelector('.ats').textContent = job.ats_type;
-    fragment.querySelector('.job-location').textContent = job.location || 'Location not specified';
-    fragment.querySelector('.job-posted').textContent = postedLabel(job.posted_at);
-    fragment.querySelector('.job-reason').textContent = job.reason;
-    const keywordRow = fragment.querySelector('.keyword-row');
-
-    for (const item of (job.matched_keywords || '').split('|').filter(Boolean)) {
-      keywordRow.append(keyword(item));
-    }
-    if (job.sponsorship_signal && job.sponsorship_signal !== 'unknown') {
-      keywordRow.append(keyword('sponsorship signal', 'signal'));
-    }
-
-    const link = fragment.querySelector('.apply-link');
-    link.href = job.job_url;
-    const prepareButton = fragment.querySelector('.prepare-button');
-    prepareButton.addEventListener('click', () => prepare(job, prepareButton));
-    jobsElement.append(fragment);
-  }
+  $('#jobs').innerHTML = visible.map(job => `
+    <button class="job ${Number(job.id) === Number(selectedId) ? 'selected' : ''}" data-job="${job.id}">
+      <span class="job-score">${Math.round(job.rank_score)}</span>
+      <span>
+        <span class="eyebrow">${esc(job.company)}</span>
+        <h4>${esc(job.title)}</h4>
+        <span class="job-meta">${esc(job.location || 'Location not specified')} · ${age(job.posted_at)}d ago</span>
+        <span class="badges">
+          <span class="badge">ATS ${Math.round(job.ats_score)}</span>
+          <span class="badge ${esc(job.sponsorship_signal)}">${esc(job.sponsorship_signal)} sponsorship</span>
+        </span>
+      </span>
+      <span class="source-tag">${esc(job.source)}</span>
+    </button>`).join('');
+  document.querySelectorAll('[data-job]').forEach(button => button.onclick = () => showDetails(jobs.find(job => Number(job.id) === Number(button.dataset.job))));
 }
-
-function renderProfile(fields) {
-  profileElement.replaceChildren();
-  for (const field of fields.filter(item => item.value)) {
-    const row = document.createElement('div');
-    row.className = 'profile-item';
-    const content = document.createElement('div');
-    const label = document.createElement('p');
-    label.className = 'eyebrow';
-    label.textContent = field.label;
-    const value = document.createElement('p');
-    value.className = `profile-value ${field.verified ? '' : 'unverified'}`.trim();
-    value.textContent = `${field.value}${field.verified ? '' : ' (confirm before autofill)'}`;
-    content.append(label, value);
-
-    const copy = document.createElement('button');
-    copy.className = 'secondary-button copy-button';
-    copy.type = 'button';
-    copy.textContent = 'Copy';
-    copy.disabled = !field.verified;
-    copy.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(field.value);
-      copy.textContent = 'Copied';
-      setTimeout(() => { copy.textContent = 'Copy'; }, 1200);
-    });
-    row.append(content, copy);
-    profileElement.append(row);
-  }
+function showDetails(job) {
+  selectedId = job.id;
+  renderJobs();
+  const missing = parsed(job.missing_skills);
+  const knockouts = parsed(job.knockout_signals);
+  $('#details').classList.add('has-selection');
+  $('#details').innerHTML = `<div class="details-content">
+    <p class="eyebrow">${esc(job.company)} · ${esc(job.source)}</p>
+    <h2>${esc(job.title)}</h2>
+    <p>${esc(job.location)} · Posted ${age(job.posted_at)}d ago</p>
+    <div class="metrics">
+      <span class="metric"><b>${Math.round(job.ats_score)}</b><span>ATS</span></span>
+      <span class="metric"><b>${Math.round(job.parsing_score)}</b><span>Parsing</span></span>
+      <span class="metric"><b>${Math.round(job.match_score)}</b><span>Match</span></span>
+      <span class="metric"><b>${Math.round(job.recruiter_score)}</b><span>Recruiter</span></span>
+    </div>
+    <h4>Assessment</h4><p>${esc(job.summary)}</p>
+    <h4>Fit reason</h4><p>${esc(job.exclusion_reason || 'No local fit reason recorded')}</p>
+    <h4>Skill coverage</h4><p>${esc(visibleSkills(job.matched_skills))}</p>
+    <h4>Missing skills</h4><div class="skill-list">${missing.length ? missing.map(skill).join('') : '<span class="subtle">None detected</span>'}</div>
+    <h4>Knockout signals</h4><p>${knockouts.length ? knockouts.map(item => esc(item.signal)).join(', ') : 'None detected'}</p>
+    <div class="actions">
+      <a href="${esc(job.apply_url)}" target="_blank" rel="noreferrer">Open application</a>
+      <button id="prepare">Prepare fields</button>
+      <button id="skip">Skip</button>
+    </div>
+    <div id="prep"></div>
+  </div>`;
+  $('#skip').onclick = async () => { await post('/api/skip', { job_id: job.id }); await load(); };
+  $('#prepare').onclick = async () => {
+    status('Preparing fields in browser...');
+    try {
+      const { result } = await post('/api/prepare', { job_id: job.id });
+      const unresolved = [...result.validation.missing, ...result.validation.blockers];
+      const reviewRequired = result.validation.review_required || [];
+      $('#prep').innerHTML = `<h4>${esc(result.status)}</h4><p>${unresolved.map(esc).join(', ') || 'Visible required fields passed validation.'}</p>${reviewRequired.length ? `<h4>Manual review required</h4><p>${reviewRequired.map(esc).join(', ')}</p>` : ''}${result.review_token ? '<div class="actions"><button id="submit">Confirm and submit</button></div>' : ''}`;
+      if (result.review_token) $('#submit').onclick = async () => {
+        if (!confirm('Submit this reviewed application?')) return;
+        await post('/api/submit', { job_id: job.id, review_token: result.review_token });
+        status('Submission attempted. Review Applications for the recorded result.');
+        await load();
+      };
+    } catch (error) { status(error.message); }
+  };
 }
-
+function renderApplications() {
+  $('#application-list').innerHTML = applications.length ? applications.map(item => `
+    <article class="row"><b>${esc(item.company)}</b><span>${esc(item.title)}</span>${state(item.status)}</article>`).join('')
+    : `<div class="empty-state"><span class="empty-icon">✓</span><h3>No applications yet</h3><p>Prepare a qualified role from the inbox to begin tracking it here.</p></div>`;
+}
+function renderSources(sources) {
+  $('#sidebar-health').textContent = sources.length ? `${sources.filter(item => item.status === 'healthy').length}/${sources.length} sources healthy` : 'Waiting for scan';
+  $('#source-list').innerHTML = sources.length ? sources.map(item => `
+    <article class="row"><b>${esc(item.source)}</b><span>${esc(item.error || `${item.job_count} jobs discovered`)}</span>${state(item.status)}</article>`).join('')
+    : `<div class="empty-state"><span class="empty-icon">⌁</span><h3>No discovery run yet</h3><p>Refresh jobs after confirming your extracted resume to populate source health.</p></div>`;
+}
+function renderProfile(profile) {
+  $('#profile-indicator').classList.toggle('verified', profile.resume_verified);
+  $('#profile-state').innerHTML = profile.resume_verified
+    ? `${state('Resume confirmed', 'verified')}<p class="subtle">ATS scoring and verified-field autofill are enabled.</p>`
+    : `${state('Confirmation required', 'unverified')}<p class="subtle">Scoring remains locked until you review and confirm this resume extraction.</p>`;
+  $('#confirm-profile').disabled = profile.resume_verified;
+  $('#confirm-profile').textContent = profile.resume_verified ? 'Resume confirmed' : 'Confirm extracted resume';
+  $('#profile-list').innerHTML = profile.fields.filter(field => field.value !== '').map(field => `
+    <article class="profile-row"><b>${esc(field.key.replaceAll('_', ' '))}</b><span>${esc(field.value)}</span>${state(field.verified ? 'Verified' : 'Needs review', field.verified ? 'verified' : 'unverified')}</article>`).join('');
+}
 async function load() {
-  statusElement.textContent = 'Loading queue...';
-  try {
-    const [{ jobs: queue }, { fields }] = await Promise.all([
-      fetchJson('/api/jobs'),
-      fetchJson('/api/profile'),
-    ]);
-    jobs = queue.sort((a, b) => Number(b.score) - Number(a.score));
-    renderJobs();
-    renderProfile(fields);
-    statusElement.textContent = 'Queue loaded';
-  } catch (error) {
-    statusElement.textContent = `Load failed: ${error.message}`;
-  }
+  const [{ jobs: list }, { applications: apps }, { sources }, profile] = await Promise.all([api('/api/jobs'), api('/api/applications'), api('/api/sources'), api('/api/profile')]);
+  jobs = list; applications = apps; renderJobs(); updateStats(); renderApplications(); renderSources(sources); renderProfile(profile);
 }
-
-for (const control of [searchInput, minimumScore, postedWithin, sponsorshipOnly]) {
-  control.addEventListener('input', renderJobs);
-}
-document.querySelector('#refresh').addEventListener('click', load);
-
-load();
+for (const selector of ['#search', '#days', '#ats', '#sponsor', '#source-filter']) $(selector).oninput = renderJobs;
+$('#scan').onclick = async () => { status('Scanning configured sources...'); try { await post('/api/scan'); await load(); status('Scan complete'); } catch (error) { status(error.message); } };
+$('#export').onclick = async () => status(`Exported ${(await post('/api/export')).path}`);
+$('#confirm-profile').onclick = async () => { await post('/api/profile/confirm'); await load(); status('Resume extraction confirmed'); };
+document.querySelectorAll('.tab').forEach(button => button.onclick = () => {
+  document.querySelectorAll('.tab,.view').forEach(item => item.classList.remove('active'));
+  button.classList.add('active'); $(`#${button.dataset.tab}`).classList.add('active');
+  const labels = { inbox: ['Application queue', 'Job Inbox'], applications: ['Review-first workflow', 'Applications'], sources: ['Discovery diagnostics', 'Source Health'], profile: ['Resume onboarding', 'Candidate Profile'] };
+  [$('#page-eyebrow').textContent, $('#page-title').textContent] = labels[button.dataset.tab];
+});
+load().catch(error => status(error.message));

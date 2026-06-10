@@ -1,4 +1,20 @@
 import { chromium } from 'playwright';
+import { consumeReviewToken, recordSubmission, savePreparation } from '../workbench.mjs';
+
+const preparedSessions = new Map();
+const DEFAULT_SAFE_AUTOFILL_FIELDS = new Set([
+  'first_name',
+  'last_name',
+  'name',
+  'email',
+  'phone',
+  'linkedin',
+  'github',
+  'website',
+  'country',
+  'city',
+  'location',
+]);
 
 function cssString(value) {
   return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
@@ -9,27 +25,42 @@ function profileValue(profile, key, fallback = '') {
   return profile[key] || fallback;
 }
 
-function fieldValueFor(label, profile) {
+function safeFields(options = {}) {
+  return new Set(options.safeAutofillFields || options.safe_autofill_fields || [...DEFAULT_SAFE_AUTOFILL_FIELDS]);
+}
+
+function fieldDecisionFor(label, profile, options = {}) {
   const key = String(label || '').toLowerCase();
   const answers = profile.application_answers || {};
-  if (/first/.test(key)) return profileValue(profile, 'first_name');
-  if (/last/.test(key)) return profileValue(profile, 'last_name');
-  if (/full.*name|name/.test(key)) return profileValue(profile, 'name', [profile.first_name, profile.last_name].filter(Boolean).join(' '));
-  if (/e-?mail/.test(key)) return profileValue(profile, 'email');
-  if (/phone|mobile/.test(key)) return profileValue(profile, 'phone');
-  if (/linkedin/.test(key)) return profileValue(profile, 'linkedin');
-  if (/github/.test(key)) return profileValue(profile, 'github');
-  if (/website|portfolio/.test(key)) return profileValue(profile, 'website');
-  if (/country/.test(key)) return profileValue(profile, 'country');
-  if (/city/.test(key)) return profileValue(profile, 'city', profileValue(profile, 'location'));
-  if (/location/.test(key)) return profileValue(profile, 'location');
-  if (/why.*(join|work|company|figma)|why.*role|interested/.test(key)) return answers.why_company || '';
-  if (/intend.*work|work.*location|from where/.test(key)) return answers.intended_work_location || profileValue(profile, 'location');
-  if (/authorized|authorised|work authorization|work authorisation/.test(key)) return profileValue(profile, 'work_authorized');
-  if (/sponsor|sponsorship|visa/.test(key)) return profile.needs_sponsorship ? 'Yes' : 'No';
-  if (/ever worked|worked for.*before|previously worked|employee or a contractor/.test(key)) return profile.previously_worked_at_company || 'No';
-  if (/years.*experience|professional experience/.test(key)) return profile.years_experience || '';
-  return '';
+  const allowed = safeFields(options);
+  let field = '';
+  let value = '';
+
+  if (/first/.test(key)) [field, value] = ['first_name', profileValue(profile, 'first_name')];
+  else if (/last/.test(key)) [field, value] = ['last_name', profileValue(profile, 'last_name')];
+  else if (/full.*name|name/.test(key)) [field, value] = ['name', profileValue(profile, 'name', [profile.first_name, profile.last_name].filter(Boolean).join(' '))];
+  else if (/e-?mail/.test(key)) [field, value] = ['email', profileValue(profile, 'email')];
+  else if (/phone|mobile/.test(key)) [field, value] = ['phone', profileValue(profile, 'phone')];
+  else if (/linkedin/.test(key)) [field, value] = ['linkedin', profileValue(profile, 'linkedin')];
+  else if (/github/.test(key)) [field, value] = ['github', profileValue(profile, 'github')];
+  else if (/website|portfolio/.test(key)) [field, value] = ['website', profileValue(profile, 'website')];
+  else if (/country/.test(key)) [field, value] = ['country', profileValue(profile, 'country')];
+  else if (/city/.test(key)) [field, value] = ['city', profileValue(profile, 'city', profileValue(profile, 'location'))];
+  else if (/location/.test(key)) [field, value] = ['location', profileValue(profile, 'location')];
+  else if (/why.*(join|work|company|figma)|why.*role|interested/.test(key)) [field, value] = ['why_company', answers.why_company || ''];
+  else if (/intend.*work|work.*location|from where/.test(key)) [field, value] = ['intended_work_location', answers.intended_work_location || profileValue(profile, 'location')];
+  else if (/authorized|authorised|work authorization|work authorisation/.test(key)) [field, value] = ['work_authorized', profileValue(profile, 'work_authorized')];
+  else if (/sponsor|sponsorship|visa/.test(key)) [field, value] = ['needs_sponsorship', profile.needs_sponsorship ? 'Yes' : 'No'];
+  else if (/ever worked|worked for.*before|previously worked|employee or a contractor/.test(key)) [field, value] = ['previously_worked_at_company', profile.previously_worked_at_company || 'No'];
+  else if (/years.*experience|professional experience/.test(key)) [field, value] = ['years_experience', profile.years_experience || ''];
+
+  if (!field || !value) return { value: '', field, safe: false };
+  return { value, field, safe: allowed.has(field) };
+}
+
+function fieldValueFor(label, profile, options = {}) {
+  const decision = fieldDecisionFor(label, profile, options);
+  return decision.safe ? decision.value : '';
 }
 
 async function fieldMeta(handle) {
@@ -53,13 +84,13 @@ async function fieldMeta(handle) {
   }, { timeout: 3000 }).catch(() => '');
 }
 
-async function fillTextInputs(page, profile) {
+async function fillTextInputs(page, profile, options) {
   const handles = await page.locator('input:not([role="combobox"]):not([type="hidden"]):not([type="file"]):not([type="radio"]):not([type="checkbox"]), textarea').all();
   let filled = 0;
 
   for (const handle of handles) {
     const meta = await fieldMeta(handle);
-    const value = fieldValueFor(meta, profile);
+    const value = fieldValueFor(meta, profile, options);
     if (!value) continue;
     await handle.fill(value).catch(() => {});
     filled += 1;
@@ -109,8 +140,7 @@ async function selectComboboxById(page, id, value) {
   return selectCombobox(box, page, value);
 }
 
-async function fillKnownFields(page, profile) {
-  const answers = profile.application_answers || {};
+async function fillKnownFields(page, profile, options) {
   let filled = 0;
   const fills = [
     ['first_name', profile.first_name],
@@ -119,21 +149,18 @@ async function fillKnownFields(page, profile) {
     ['phone', profile.phone],
     ['question_13365383004', profile.linkedin],
     ['question_13365384004', profile.website || profile.github],
-    ['question_13365385004', answers.why_company],
-    ['question_13365388004', answers.intended_work_location || profileValue(profile, 'location')],
     ['question_13365389004', profile.first_name],
   ];
 
   for (const [id, value] of fills) {
+    const meta = id.includes('question_') ? '' : id;
+    if (meta && !safeFields(options).has(meta)) continue;
     if (await fillById(page, id, value)) filled += 1;
   }
 
   const combos = [
     ['country', profileValue(profile, 'country')],
     ['candidate-location', profileValue(profile, 'city', profileValue(profile, 'location'))],
-    ['question_13365390004', profileValue(profile, 'work_authorized')],
-    ['question_13365391004', profile.previously_worked_at_company || 'No'],
-    ['question_14143706004', profile.years_experience],
   ];
 
   for (const [id, value] of combos) {
@@ -163,25 +190,25 @@ async function chooseOptionByValue(page, field, value) {
   return false;
 }
 
-async function fillSelects(page, profile) {
+async function fillSelects(page, profile, options) {
   const selects = await page.locator('select').all();
   let filled = 0;
   for (const select of selects) {
     const meta = await fieldMeta(select);
-    const value = fieldValueFor(meta, profile);
+    const value = fieldValueFor(meta, profile, options);
     if (!value) continue;
     if (await chooseOptionByValue(page, select, value)) filled += 1;
   }
   return filled;
 }
 
-async function fillComboboxes(page, profile) {
+async function fillComboboxes(page, profile, options) {
   const boxes = await page.locator('input[role="combobox"]').all();
   let filled = 0;
 
   for (const box of boxes) {
     const meta = await fieldMeta(box);
-    const value = fieldValueFor(meta, profile);
+    const value = fieldValueFor(meta, profile, options);
     if (!value) continue;
 
     if (await selectCombobox(box, page, value)) filled += 1;
@@ -190,7 +217,7 @@ async function fillComboboxes(page, profile) {
   return filled;
 }
 
-async function fillRadiosAndCheckboxes(page, profile) {
+async function fillRadiosAndCheckboxes(page, profile, options) {
   const fields = await page.locator('input[type="radio"], input[type="checkbox"]').all();
   const handledRadioNames = new Set();
   let filled = 0;
@@ -199,7 +226,7 @@ async function fillRadiosAndCheckboxes(page, profile) {
     const type = String(await field.getAttribute('type') || '').toLowerCase();
     const name = await field.getAttribute('name') || '';
     const meta = await fieldMeta(field);
-    const value = fieldValueFor(meta, profile);
+    const value = fieldValueFor(meta, profile, options);
     if (!value) continue;
 
     if (type === 'checkbox') {
@@ -343,6 +370,21 @@ async function validateRequiredFields(page) {
   });
 }
 
+async function reviewRequiredFields(page, profile, options) {
+  const fields = await page.locator('input:not([type="hidden"]):not([type="file"]), textarea, select').all();
+  const labels = new Set();
+
+  for (const field of fields) {
+    const visible = await field.isVisible({ timeout: 500 }).catch(() => false);
+    if (!visible) continue;
+    const meta = await fieldMeta(field);
+    const decision = fieldDecisionFor(meta, profile, options);
+    if (decision.value && !decision.safe) labels.add(meta || decision.field);
+  }
+
+  return [...labels].slice(0, 25);
+}
+
 async function clickSubmitAndVerify(page) {
   const buttons = [
     page.getByRole('button', { name: /submit|send application|apply now|submit application/i }).first(),
@@ -378,18 +420,25 @@ async function clickSubmitAndVerify(page) {
   };
 }
 
-async function prepareOne(page, job, profile, resumePath) {
+async function prepareOne(page, job, profile, resumePath, options = {}) {
   await page.goto(job.job_url, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForTimeout(1500);
 
   const applyEntry = await openApplicationForm(page);
-  const knownFields = await fillKnownFields(page, profile);
-  const textFields = await fillTextInputs(page, profile);
-  const selectFields = await fillSelects(page, profile);
-  const comboFields = await fillComboboxes(page, profile);
-  const choiceFields = await fillRadiosAndCheckboxes(page, profile);
+  const knownFields = await fillKnownFields(page, profile, options);
+  const textFields = await fillTextInputs(page, profile, options);
+  const selectFields = await fillSelects(page, profile, options);
+  const comboFields = await fillComboboxes(page, profile, options);
+  const choiceFields = await fillRadiosAndCheckboxes(page, profile, options);
   const fileFields = await uploadResume(page, resumePath);
   const validation = await validateRequiredFields(page);
+  const reviewRequired = await reviewRequiredFields(page, profile, options);
+  const effectiveValidation = {
+    ...validation,
+    ok: validation.ok && reviewRequired.length === 0,
+    blockers: reviewRequired.length ? [...validation.blockers, 'manual review required'] : validation.blockers,
+    review_required: reviewRequired,
+  };
 
   return {
     company: job.company,
@@ -402,18 +451,18 @@ async function prepareOne(page, job, profile, resumePath) {
     combobox_fields_filled: comboFields,
     choice_fields_filled: choiceFields,
     file_fields_uploaded: fileFields,
-    validation,
-    status: validation.ok ? 'READY_TO_SUBMIT' : 'NEEDS_REVIEW',
+    validation: effectiveValidation,
+    status: effectiveValidation.ok ? 'READY_TO_SUBMIT' : 'NEEDS_REVIEW',
   };
 }
 
-export async function prepareApplications(jobs, profile, resumePath) {
-  const browser = await chromium.launch({ headless: false });
+export async function prepareApplications(jobs, profile, resumePath, options = {}) {
+  const browser = await chromium.launchPersistentContext('data/browser-profile', { headless: false });
   const results = [];
 
   for (const job of jobs) {
     const page = await browser.newPage();
-    const result = await prepareOne(page, job, profile, resumePath);
+    const result = await prepareOne(page, job, profile, resumePath, options);
     results.push(result);
     console.log(`${result.status}: ${job.company} - ${job.title}`);
     if (!result.validation.ok) {
@@ -424,13 +473,13 @@ export async function prepareApplications(jobs, profile, resumePath) {
   return { browser, results };
 }
 
-export async function submitApplications(jobs, profile, resumePath) {
-  const browser = await chromium.launch({ headless: false });
+export async function submitApplications(jobs, profile, resumePath, options = {}) {
+  const browser = await chromium.launchPersistentContext('data/browser-profile', { headless: false });
   const results = [];
 
   for (const job of jobs) {
     const page = await browser.newPage();
-    const prepared = await prepareOne(page, job, profile, resumePath);
+    const prepared = await prepareOne(page, job, profile, resumePath, options);
     if (!prepared.validation.ok) {
       console.log(`NOT_SUBMITTED: ${job.company} - ${job.title}`);
       console.log(`Missing/blockers: ${[...prepared.validation.missing, ...prepared.validation.blockers].join('; ')}`);
@@ -451,4 +500,26 @@ export async function submitApplications(jobs, profile, resumePath) {
 
   await browser.close();
   return results;
+}
+
+export async function prepareJob(job, profile, resumePath, options = {}) {
+  const browser = await chromium.launchPersistentContext('data/browser-profile', { headless: false });
+  const page = await browser.newPage();
+  const result = await prepareOne(page, job, profile, resumePath, options);
+  const reviewToken = savePreparation(job.id, result);
+  preparedSessions.set(Number(job.id), { browser, page, result });
+  return { ...result, review_token: reviewToken, browser };
+}
+
+export async function submitPreparedJob(job, profile, resumePath, reviewToken) {
+  if (!consumeReviewToken(job.id, reviewToken)) throw new Error('A valid one-time review token from Prepare fields is required');
+  const session = preparedSessions.get(Number(job.id));
+  if (!session) throw new Error('Reviewed browser session is no longer open. Prepare the application again.');
+  if (!session.result.validation.ok) throw new Error('Prepared form has unresolved blockers');
+  const submission = await clickSubmitAndVerify(session.page);
+  const result = { ...session.result, ...submission, submitted: submission.clicked && submission.confirmed };
+  preparedSessions.delete(Number(job.id));
+  await session.browser.close();
+  recordSubmission(job.id, result);
+  return result;
 }

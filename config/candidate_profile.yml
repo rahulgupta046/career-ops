@@ -1,34 +1,31 @@
 name: Rahul Gupta
+resume_verified: true
 first_name: Rahul
 last_name: Gupta
-email: "gupta.rahul7425@gmail.com"
-phone: "+1 (812) 778-5987"
-linkedin: ""
-github: "https://github.com/rahulgupta046"
-website: ""
+email: gupta.rahul7425@gmail.com
+phone: +1 (812) 778-5987
+linkedin: ''
+github: https://github.com/rahulgupta046
+website: ''
 location: California, USA
 country: United States
-city: "San Francisco"
-years_experience: "2"
-work_authorized: "Yes"
+city: San Francisco
+years_experience: '2'
+work_authorized: 'Yes'
 needs_sponsorship: true
-previously_worked_at_company: "No"
+previously_worked_at_company: 'No'
 unverified_fields:
   - city
   - work_authorized
-
 application_answers:
   why_company: >
-    I am interested in this role because it maps directly to the systems I have
-    been building: production AI infrastructure, distributed data pipelines, and
-    backend services where reliability and scale matter. I would bring hands-on
-    experience from Amazon ranking systems, PySpark feature pipelines, and LLM
-    serving work to help the team ship dependable product infrastructure.
+    I am interested in this role because it maps directly to the systems I have been building:
+    production AI infrastructure, distributed data pipelines, and backend services where reliability
+    and scale matter. I would bring hands-on experience from Amazon ranking systems, PySpark feature
+    pipelines, and LLM serving work to help the team ship dependable product infrastructure.
   intended_work_location: San Francisco, CA
-
 compressed_profile: >
-  Data Engineer / Backend / ML background. Python, SQL, PySpark,
-  Databricks, Redshift, AWS. Amazon SDE experience with ranking systems,
-  feature pipelines, model serving. Publicis/Disney data engineering
-  experience with DCM/CM360, CIMA dashboards, Redshift procedures, ETL QA.
-  Needs sponsorship-friendly roles.
+  Data Engineer / Backend / ML background. Python, SQL, PySpark, Databricks, Redshift, AWS. Amazon
+  SDE experience with ranking systems, feature pipelines, model serving. Publicis/Disney data
+  engineering experience with DCM/CM360, CIMA dashboards, Redshift procedures, ETL QA. Needs
+  sponsorship-friendly roles.

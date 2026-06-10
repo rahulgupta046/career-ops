@@ -1,0 +1,61 @@
+basics:
+  name: Rahul Gupta
+  label: AI Systems Engineer
+  email: gupta.rahul7425@gmail.com
+  phone: "+1 (812) 778-5987"
+  summary: >-
+    AI systems engineer building production LLM infrastructure, distributed
+    ML/data pipelines, retrieval systems, and applied GenAI workflows under
+    latency, cost, and reliability constraints.
+  location:
+    region: CA
+    countryCode: US
+  profiles:
+    - network: GitHub
+      username: rahulgupta046
+      url: https://github.com/rahulgupta046
+work:
+  - name: Amazon
+    position: Software Development Engineer - AI Infrastructure / Ranking Systems
+    startDate: 2024-12
+    summary: Production LLM inference, ranking infrastructure, and distributed ML pipelines.
+    highlights:
+      - Designed production LLM inference and ranking infrastructure handling 10K+ QPS with p99 latency under 55ms using FastAPI, Triton Server, gRPC, and Protobuf.
+      - Productionized distributed PySpark pipelines processing tens of terabytes of daily interaction data.
+      - Reduced Spark training runtime from about 9 hours to 2.5 hours and cluster cost by 50%.
+  - name: Sherpa Analytics
+    position: Generative AI Engineer
+    startDate: 2024-08
+    endDate: 2024-12
+    highlights:
+      - Built a HIPAA-aware voice-to-clinical-record pipeline using Deepgram Nova-2, GPT-4o, DSPy, PII masking, and SQL.
+      - Designed a pgvector retrieval pipeline with Med-BERT embeddings and SQL joins.
+  - name: Indiana University
+    position: Machine Learning Engineer
+    startDate: 2024-05
+    endDate: 2024-07
+    highlights:
+      - Developed PyTorch GAN models for synthetic emissions datasets.
+      - Built FastAPI services supporting 15+ ML training workflows.
+education:
+  - institution: Indiana University Bloomington
+    studyType: Master of Science
+    area: Computer Science
+    startDate: 2022-08
+    endDate: 2024-05
+skills:
+  - name: Languages
+    keywords: [Python, Java, Scala, SQL, TypeScript]
+  - name: AI and LLM Systems
+    keywords: [LLM Inference, RAG, Retrieval Pipelines, Embeddings, DSPy, Triton Server, pgvector, A/B Testing]
+  - name: Backend and Platform
+    keywords: [FastAPI, PyTorch, LangChain, Pydantic, gRPC, Protobuf, Docker, Async Orchestration]
+  - name: Data and MLOps
+    keywords: [Spark, PySpark, dbt, Snowflake, Airflow, ML Pipelines, Observability]
+  - name: Cloud and Databases
+    keywords: [AWS, EMR, S3, EC2, GCP, PostgreSQL, Vector Search, ClickHouse]
+projects:
+  - name: Distributed Key-Value Store
+    url: https://github.com/rahulgupta046/distributedKV
+    description: Python distributed key-value store with multiple consistency models.
+    keywords: [Python, Distributed Systems, Vector Clocks, Fault Tolerance]

@@ -3,94 +3,136 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Finder Queue</title>
+    <title>Application Workbench</title>
     <link rel="stylesheet" href="/styles.css">
   </head>
   <body>
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">Job Finder MVP</p>
-        <h1>Application Queue</h1>
-      </div>
-      <div class="topbar-actions">
-        <span id="job-count" class="count"></span>
-        <button id="refresh" class="secondary-button" type="button">Refresh</button>
-      </div>
-    </header>
-
-    <main>
-      <section class="toolbar" aria-label="Queue controls">
-        <label class="search-field">
-          <span>Search</span>
-          <input id="search" type="search" placeholder="Company, title, location, or keyword">
-        </label>
-        <label>
-          <span>Minimum score</span>
-          <select id="minimum-score">
-            <option value="70">70+</option>
-            <option value="80" selected>80+</option>
-            <option value="85">85+</option>
-            <option value="90">90+</option>
-          </select>
-        </label>
-        <label>
-          <span>Posted within</span>
-          <select id="posted-within">
-            <option value="1">1 day</option>
-            <option value="3">3 days</option>
-            <option value="7" selected>7 days</option>
-          </select>
-        </label>
-        <label class="check-label">
-          <input id="sponsorship-only" type="checkbox">
-          <span>Sponsorship signals only</span>
-        </label>
-      </section>
-
-      <section class="content-grid">
-        <section class="queue-section" aria-labelledby="queue-heading">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Ranked locally</p>
-              <h2 id="queue-heading">Best matches</h2>
-            </div>
-            <p id="status" class="status" aria-live="polite"></p>
-          </div>
-          <div id="jobs" class="jobs"></div>
-        </section>
-
-        <aside class="profile-section" aria-labelledby="profile-heading">
-          <p class="eyebrow">Reusable autofill</p>
-          <h2 id="profile-heading">Candidate profile</h2>
-          <p class="subtle">Prepare fills obvious fields and leaves the browser open for review. It never submits.</p>
-          <div id="profile" class="profile-list"></div>
-        </aside>
-      </section>
-    </main>
-
-    <template id="job-template">
-      <article class="job">
-        <div class="job-score"></div>
-        <div class="job-main">
-          <div class="job-title-row">
-            <div>
-              <p class="job-company"></p>
-              <h3 class="job-title"></h3>
-            </div>
-            <span class="ats"></span>
-          </div>
-          <p class="job-location"></p>
-          <p class="job-posted"></p>
-          <p class="job-reason"></p>
-          <div class="keyword-row"></div>
-          <div class="job-actions">
-            <a class="primary-button apply-link" target="_blank" rel="noreferrer">Open application</a>
-            <button class="secondary-button prepare-button" type="button">Prepare fields</button>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">RW</span>
+          <div>
+            <p class="eyebrow">Local workspace</p>
+            <h1>Role Workbench</h1>
           </div>
         </div>
-      </article>
-    </template>
+        <nav class="tabs" aria-label="Primary navigation">
+          <button class="tab active" data-tab="inbox"><span class="tab-icon">⌂</span><span>Inbox</span><b id="nav-job-count">0</b></button>
+          <button class="tab" data-tab="applications"><span class="tab-icon">✓</span><span>Applications</span><b id="nav-app-count">0</b></button>
+          <button class="tab" data-tab="sources"><span class="tab-icon">⌁</span><span>Sources</span></button>
+          <button class="tab" data-tab="profile"><span class="tab-icon">●</span><span>Profile</span><i id="profile-indicator"></i></button>
+        </nav>
+        <div class="sidebar-footer">
+          <p>Runs locally on this Mac</p>
+          <span id="sidebar-health">Waiting for scan</span>
+        </div>
+      </aside>
 
+      <div class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow" id="page-eyebrow">Application queue</p>
+            <h2 id="page-title">Job Inbox</h2>
+          </div>
+          <div class="topbar-actions">
+            <button id="export" class="button ghost">Export CSV</button>
+            <button id="scan" class="button primary">Refresh jobs</button>
+          </div>
+        </header>
+
+        <main>
+          <p id="status" class="status" aria-live="polite"></p>
+
+          <section id="inbox" class="view active">
+            <section class="summary-strip" aria-label="Queue summary">
+              <article><span>Qualified roles</span><strong id="stat-qualified">0</strong></article>
+              <article><span>Fresh this week</span><strong id="stat-fresh">0</strong></article>
+              <article><span>Sponsorship signals</span><strong id="stat-sponsor">0</strong></article>
+              <article><span>Average ATS score</span><strong id="stat-ats">--</strong></article>
+            </section>
+
+            <section class="filters" aria-label="Inbox filters">
+              <label class="search-control">
+                <span>Search roles</span>
+                <input id="search" type="search" placeholder="Company, role, or location">
+              </label>
+              <label>
+                <span>ATS score</span>
+                <select id="ats"><option>0</option><option selected>70</option><option>75</option><option>80</option></select>
+              </label>
+              <label>
+                <span>Posted within</span>
+                <select id="days"><option value="1">1 day</option><option value="3">3 days</option><option value="7" selected>7 days</option></select>
+              </label>
+              <label>
+                <span>Sponsorship</span>
+                <select id="sponsor"><option value="">Positive + unknown</option><option value="positive">Positive only</option><option value="unknown">Unknown only</option></select>
+              </label>
+              <label>
+                <span>Source</span>
+                <select id="source-filter">
+	                  <option value="">All sources</option>
+	                  <option value="ever-jobs">Ever Jobs</option>
+	                  <option value="jobspy">JobSpy</option>
+	                </select>
+              </label>
+            </section>
+
+            <section class="inbox-layout">
+              <div class="list-pane">
+                <div class="pane-heading">
+                  <div>
+                    <p class="eyebrow">Ranked opportunities</p>
+                    <h3>Best matches</h3>
+                  </div>
+                  <span id="job-count">0 roles</span>
+                </div>
+                <div id="jobs" class="jobs"></div>
+              </div>
+              <aside id="details" class="details-pane">
+                <div class="empty-state compact">
+                  <span class="empty-icon">◎</span>
+                  <h3>Select a role</h3>
+                  <p>Inspect ATS alignment, missing skills, sponsorship signals, and application actions.</p>
+                </div>
+              </aside>
+            </section>
+          </section>
+
+          <section id="applications" class="view">
+            <header class="section-heading">
+              <div><p class="eyebrow">Review-first workflow</p><h3>Applications</h3></div>
+            </header>
+            <div id="application-list" class="table-list"></div>
+          </section>
+
+          <section id="sources" class="view">
+            <header class="section-heading">
+              <div><p class="eyebrow">Discovery diagnostics</p><h3>Source health</h3></div>
+            </header>
+            <div id="source-list" class="table-list"></div>
+          </section>
+
+          <section id="profile" class="view">
+            <div class="profile-layout">
+              <section class="profile-intro">
+                <p class="eyebrow">Resume onboarding</p>
+                <h3>Verified candidate profile</h3>
+                <p>Review the facts extracted from your PDF resume. Confirmed facts are used for ATS analysis and application preparation. Application-only answers remain blank until verified.</p>
+                <div id="profile-state"></div>
+                <button id="confirm-profile" class="button primary">Confirm extracted resume</button>
+              </section>
+              <section>
+                <div class="pane-heading">
+                  <div><p class="eyebrow">Autofill inventory</p><h3>Candidate fields</h3></div>
+                </div>
+                <div id="profile-list" class="profile-list"></div>
+              </section>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
     <script type="module" src="/app.js"></script>
   </body>
 </html>

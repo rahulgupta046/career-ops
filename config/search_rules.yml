@@ -5,6 +5,48 @@ target_roles:
   - AI Engineer
   - Forward Deployed Engineer
 
+role_families:
+  backend:
+    titles:
+      - software engineer
+      - backend engineer
+      - platform engineer
+      - infrastructure engineer
+    strong_terms:
+      - backend
+      - distributed systems
+      - api
+      - services
+      - databases
+      - infrastructure
+      - aws
+  ai_ml:
+    titles:
+      - machine learning engineer
+      - ai engineer
+      - applied ai engineer
+      - ml engineer
+    strong_terms:
+      - machine learning
+      - llm
+      - rag
+      - embeddings
+      - model serving
+      - evaluation
+      - production ml
+  data_platform:
+    titles:
+      - data engineer
+      - analytics engineer
+      - platform engineer
+    strong_terms:
+      - sql
+      - spark
+      - databricks
+      - data pipelines
+      - etl
+      - warehouse
+
 locations:
   - Remote
   - New York
@@ -26,6 +68,36 @@ required_keywords:
   - llm
   - rag
 
+must_have_any:
+  - python
+  - backend
+  - machine learning
+  - llm
+  - data engineer
+
+strong_positive:
+  - distributed systems
+  - backend
+  - aws
+  - spark
+  - databricks
+  - machine learning
+  - llm
+  - rag
+  - embeddings
+  - model serving
+  - data pipelines
+
+nice_to_have:
+  - kubernetes
+  - airflow
+  - redshift
+  - postgres
+  - typescript
+  - evaluation
+  - retrieval
+  - vector database
+
 negative_keywords:
   - senior
   - sr.
@@ -37,8 +109,13 @@ negative_keywords:
   - director
   - unpaid
   - internship
+  - contract
   - contract only
   - clearance required
+  - security clearance
+  - us citizen
+  - u.s. citizen
+  - citizenship required
 
 seniority_exclusion_keywords:
   - senior
@@ -48,6 +125,22 @@ seniority_exclusion_keywords:
   - lead
   - manager
   - director
+
+negative_role_keywords:
+  - sales engineer
+  - solutions engineer
+  - solution engineer
+  - solutions architect
+  - support engineer
+  - qa engineer
+  - test engineer
+  - data analyst
+  - business analyst
+  - product manager
+  - program manager
+  - technical program manager
+  - devops engineer
+  - site reliability engineer
 
 sponsorship_keywords:
   - visa
@@ -61,4 +154,16 @@ score_threshold: 70
 max_experience_years: 3
 max_posted_age_days: 7
 include_jobs_without_posted_at: false
+safe_autofill_fields:
+  - first_name
+  - last_name
+  - name
+  - email
+  - phone
+  - linkedin
+  - github
+  - website
+  - country
+  - city
+  - location
 resume_path: /Users/rahulgupta/Documents/resumesss/new/001_Rahul_Resume_AI.pdf

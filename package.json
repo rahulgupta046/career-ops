@@ -1,26 +1,39 @@
 {
-  "name": "job-finder-mvp",
-  "version": "0.1.0",
-  "description": "Review-first ATS job finder and application prep MVP",
+  "name": "local-application-workbench",
+  "version": "0.2.0",
+  "description": "Local job discovery, ATS analysis, and review-first application workbench",
   "type": "module",
   "scripts": {
-    "find": "node src/main.mjs find",
+    "setup": "node scripts/setup.mjs",
+    "integrations:install": "node scripts/integrations.mjs install",
+    "integrations:start": "node scripts/integrations.mjs start",
+    "integrations:stop": "node scripts/integrations.mjs stop",
+    "integrations:start:local": "node scripts/integrations.mjs start-local",
+    "integrations:stop:local": "node scripts/integrations.mjs stop-local",
+    "scan": "node src/main.mjs scan",
+    "scan:light": "DISABLE_EVER_JOBS=1 node src/main.mjs scan",
+    "find": "node src/main.mjs scan",
     "ui": "node src/ui/server.mjs",
+    "ui:light": "DISABLE_EVER_JOBS=1 node src/ui/server.mjs",
     "prepare": "node src/npm_prepare.mjs",
     "apply": "node src/main.mjs apply",
+    "export": "node src/main.mjs export",
+    "scheduler:install": "node scripts/scheduler.mjs install",
+    "scheduler:remove": "node scripts/scheduler.mjs remove",
     "verify": "node verify-mvp.mjs"
   },
   "keywords": [
     "job-search",
     "ats",
-    "greenhouse",
-    "lever",
-    "ashby"
+    "discovery",
+    "applications"
   ],
   "license": "MIT",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.99.0",
+    "better-sqlite3": "^11.10.0",
     "js-yaml": "^4.1.1",
-    "playwright": "^1.58.1"
+    "playwright": "^1.58.1",
+    "resuml": "^3.2.0"
   }
 }
